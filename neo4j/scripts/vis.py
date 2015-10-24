@@ -63,18 +63,23 @@ def vis_network(nodes, edges, physics=False):
     return IFrame(filename, width="100%", height="400")
 
 def draw(graph, options, physics=False, limit=100):
-    # The options argument should be a dictionary of node labels and property keys; it determines which property 
-    # is displayed for the node label. For example, in the movie graph, options = {"Movie": "title", "Person": "name"}.
-    # Omitting a node label from the options dict will leave the node unlabeled in the visualization.
-    # Setting physics = True makes the nodes bounce around when you touch them!
     query = """
     MATCH n
     OPTIONAL MATCH (n)-[r]->(m)
-    RETURN n, r, m 
+    RETURN n, r, m
     LIMIT {limit}
     """
 
     data = graph.cypher.execute(query, limit=limit)
+
+    return draw_query(data, options, physics)
+	
+
+def draw_query(data, options, physics=False):
+    # The options argument should be a dictionary of node labels and property keys; it determines which property 
+    # is displayed for the node label. For example, in the movie graph, options = {"Movie": "title", "Person": "name"}.
+    # Omitting a node label from the options dict will leave the node unlabeled in the visualization.
+    # Setting physics = True makes the nodes bounce around when you touch them!
 
     nodes = []
     edges = []
@@ -96,6 +101,7 @@ def draw(graph, options, physics=False, limit=100):
         return {"id": vis_id, "label": vis_label, "group": node_label, "title": repr(title)}
 
     for row in data:
+
         source = row[0]
         rel = row[1]
         target = row[2]
